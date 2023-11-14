@@ -4,9 +4,11 @@ from django.conf import settings
 
 # Create your models here.
 class Genre(models.Model):
+    genre_id = models.IntegerField()
     name = models.CharField(max_length=50)
     
 class Movie(models.Model):
+    movie_id = models.IntegerField()
     title = models.CharField(max_length=50)
     overview = models.TextField(blank=True)
     poster = models.ImageField(blank=True)
