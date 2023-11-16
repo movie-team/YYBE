@@ -1,197 +1,74 @@
-from django.shortcuts import get_list_or_404, get_object_or_404
-from .models import User
-from .serializers import UserSerializer
-from django.contrib.auth import get_user_model
-from rest_framework.response import Response
-from rest_framework.decorators import api_view, permission_classes
-from rest_framework import status
-from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
-from django.contrib.auth import authenticate
-# JWT 토큰 검증 모듈
-from rest_framework.permissions import IsAuthenticated
-# refresh_token 객체 생성
-from rest_framework_simplejwt.tokens import RefreshToken
-# 비밀번호 비교 모듈
-from django.contrib.auth.hashers import check_password
+from django.shortcuts import render, redirect      
+import requests    
 
-# 회원가입
-@api_view(['POST'])
-def signup(request):
-    serializer = UserSerializer(data=request.data)
 
-    if serializer.is_valid():
-        user = serializer.save()
-        
-        # jwt 토큰 접근
-        token = TokenObtainPairSerializer.get_token(user)
-        refresh_token = str(token)
-        access_token = str(token.access_token)
-        response = Response(
-            {
-                'user': serializer.data,
-                'message': 'signup successs',
-                'token': {
-                    'access': access_token,
-                    'refresh': refresh_token,
-                },
-            },
-            status=status.HTTP_200_OK,
-        )
-        
-        # jwt 토큰 쿠키에 저장
-        response.set_cookie('access', access_token, httponly=True)
-        response.set_cookie('refresh', refresh_token, httponly=True)
-        
-        return response
-    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-# 회원 삭제
-@api_view(['DELETE'])
-@permission_classes([IsAuthenticated])
-def signout(request):
-    user = request.user
+# code 요청
+def kakao_login(request):
+    app_rest_api_key = 'ea9a470844fc6ce1db188cf13bbe325a'
+    # redirect_uri = "https://kauth.kakao.com/.well-known/openid-configuration"
+    redirect_uri = "http://127.0.0.1:8000/account/login/kakao/callback"
+    return redirect(
+        f"https://kauth.kakao.com/oauth/authorize?client_id={app_rest_api_key}&redirect_uri={redirect_uri}&response_type=code"
+    )
     
-    # 유저 삭제
-    user.delete()
     
-    # 유저의 토큰을 블랙리스트에 추가
-    refresh_token = request.COOKIES.get('refresh')
-    try:
-        token = RefreshToken(refresh_token)
-        token.blacklist()
-        # 쿠키에서 토큰 삭제
-        response = Response({
-            "message": "signout success"
-        }, status=status.HTTP_200_OK)
+# access token 요청
+def kakao_callback(request): 
+    app_rest_api_key = 'ea9a470844fc6ce1db188cf13bbe325a'
+    redirect_uri = "http://127.0.0.1:8000/account/login/kakao/callback"                                                                 
+    code = request.GET.get('code')
 
-        response.delete_cookie('access')
-        response.delete_cookie('refresh')
+    # POST 요청을 보낼 엔드포인트 URL
+    url = "https://kauth.kakao.com/oauth/token"
 
-        return response
-    except Exception as e:
-        return Response({'message': str(e)}, status=500)
+    # POST 요청의 데이터 설정
+    data = {
+        "grant_type": "authorization_code",
+        "client_id": app_rest_api_key,
+        "redirect_uri": redirect_uri,
+        "code": code,
+    }
 
-# 로그인
-@api_view(['POST'])
-def login(request):
-    # 유저 인증
-    
-    User = get_user_model()
-    user = User.objects.get(email=request.data.get('email'))
+    # Content-Type 헤더 설정
+    headers = {
+        "Content-Type": "application/x-www-form-urlencoded",
+    }
 
-    if user is not None:
-        if check_password(request.data.get('password'), user.password):
-            serializer = UserSerializer(user)
-            # jwt 토큰 접근
-            token = TokenObtainPairSerializer.get_token(user)
-            refresh_token = str(token)
-            access_token = str(token.access_token)
-            res = Response(
-                {
-                    'user': serializer.data,
-                    'message': 'login success',
-                    'token': {
-                        'access': access_token,
-                        'refresh': refresh_token,
-                    },
-                },
-                status=status.HTTP_200_OK,
-            )
-            # jwt 토큰 쿠키에 저장
-            res.set_cookie('access', access_token, httponly=True)
-            res.set_cookie('refresh', refresh_token, httponly=True)
-            return res
-        else:
-            return Response({'message': 'wrong password'}, status=status.HTTP_400_BAD_REQUEST)
+    # POST 요청 보내기
+    response = requests.post(url, data=data, headers=headers)
+
+    if response.status_code == 200:
+        # 요청이 성공했을 때 처리할 코드
+        response_data = response.json()
+        access_token = response_data.get("access_token")
+        # access_token을 사용하거나 처리하는 로직을 작성합니다.
+        print(response_data)
     else:
-        return Response(status=status.HTTP_400_BAD_REQUEST)
+        # 요청이 실패했을 때 처리할 코드
+        print("요청이 실패했습니다.")
+        print(response.status_code)
+        print(response.text)
 
-# 로그아웃    
-@api_view(['POST'])
-@permission_classes([IsAuthenticated])
-def logout(request):
-    refresh_token = request.COOKIES.get('refresh')
-    try:
-        token = RefreshToken(refresh_token)
-        token.blacklist()  # 블랙리스트에 추가하여 해당 토큰으로 접근 불가
-        response = Response({
-            "message": "Logout success"
-        }, status=status.HTTP_202_ACCEPTED)
+def kakao_logout(request):
+    ACCESS_TOKEN = request.GET.get('access_token')
+    # 요청을 보낼 URL
+    url = "https://kapi.kakao.com/v1/user/logout"
 
-        response.delete_cookie("access")
-        response.delete_cookie("refresh") # 쿠키에서 해당 토큰 삭제
+    # 요청 헤더
+    headers = {
+        "Content-Type": "application/x-www-form-urlencoded",
+        "Authorization": f"Bearer {ACCESS_TOKEN}"  # ACCESS_TOKEN 변수에 본인의 액세스 토큰을 넣어주세요.
+    }
 
-        return response
-    except Exception as e:
-        return Response({'message': str(e)}, status=500)
-    
-# 유저 정보 변경    
-@api_view(['PUT'])
-@permission_classes([IsAuthenticated])
-def update(request):
-    User = get_user_model()
-    user = User.objects.get(email=request.user.email)
-    serializer = UserSerializer(user, data=request.data)
+    # POST 요청 보내기
+    response = requests.post(url, headers=headers)
 
-    if serializer.is_valid():
-        serializer.save()
-
-        response = Response(
-            {
-                'user': serializer.data,
-                'message': 'update successs',
-            },
-            status=status.HTTP_200_OK,
-        )
-
-        return response
-    
-    return Response(serializer.data, status=status.HTTP_400_BAD_REQUEST)
-
-
-# 비밀번호 변경
-@api_view(['PUT'])
-@permission_classes([IsAuthenticated])
-def password(request):
-    new_password = request.data.get('password')
-    
-    try:
-        # JWT 토큰 재설정
-        token = TokenObtainPairSerializer.get_token(request.user)
-        refresh_token = str(token)
-        access_token = str(token.access_token)
-        # 새로운 비밀번호 설정
-        request.user.set_password(new_password)
-        request.user.save()
-
-
-        response = Response(
-            {
-                'access_token': access_token,
-                'refresh_token': refresh_token,
-                'message': 'Password changed successfully.'
-            }
-        )
-
-        return response
-
-    except Exception as e:
-        response = Response(
-            {
-                'message': 'Failed to change password.', 
-                'error': str(e)
-            }, 
-            status=status.HTTP_400_BAD_REQUEST
-        )
-
-        return response
-    
-
-# 사용자 정보 제공
-@api_view(['GET'])
-@permission_classes([IsAuthenticated])
-def profile(request):
-    User = get_user_model()
-    user = get_object_or_404(User, email=request.user.email)
-    serializer = UserSerializer(user)
-    return Response(serializer.data)
+    # 응답 확인
+    if response.status_code == 200:
+        # 성공적인 응답
+        print("로그아웃이 완료되었습니다.")
+        return redirect('articles: index')
+    else:
+        # 요청이 실패한 경우
+        print(f"HTTP 요청 실패 - 상태 코드: {response.status_code}")
+        print(response.text)  # 실패한 경우 응답 본문을 확인할 수 있습니다.
