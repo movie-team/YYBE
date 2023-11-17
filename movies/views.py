@@ -1,19 +1,69 @@
 from django.shortcuts import render
+from django.conf import settings
+from django.http import JsonResponse
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
 import requests
-import json
+from .serializers import MovieSerializer, GenreSerializer
+from .models import Movie, Genre
 
 
 # Create your views here.
-def get_movie_data():
-    total_data = []
-    API_KEY = 'a5652a4c9a3b598372e418a3b9c37371'
-    for i in range(1, 11):
-        request_url = f'https://api.themoviedb.org/3/movie/popular?api_key={API_KEY}&language=ko-KR&page={i}'
-        movies = requests.get(request_url).json()
 
-        for movie in movies['results']:
-            if movie['release_date']:
-                fields = {
+access_token = settings.ACCESS_TOKEN
+api_key = settings.API_KEY
+
+
+@api_view(['GET'])
+def save_genre_data(request):
+    url = 'https://api.themoviedb.org/3/genre/movie/list'
+
+    params = {
+        'api_key' : api_key,
+        'language' : 'ko',
+    }
+
+    response = requests.get(url, params=params).json()
+
+    for genre in response['genres']:
+        save_data = {
+            'genre_id': genre['id'],
+            'name': genre['name']
+        }
+        serializer = GenreSerializer(data=save_data)
+        if serializer.is_valid(raise_exception=True):
+            serializer.save()
+    
+    return JsonResponse({ 'message': 'okay' })
+
+
+@api_view(['GET'])
+def save_movie_data(request):
+    for i in range(1, 51):
+        url = f"https://api.themoviedb.org/3/movie/popular?language=en-US&page={i}&region=KR"
+
+        headers = {
+            "accept": "application/json",
+            "Authorization": f"Bearer {access_token}"
+        }
+        
+        genres = Genre.objects.values()
+        genre_li = []
+        for genre in genres:
+            if genre['genre_id'] not in genre_li:
+                genre_li.append(genre['genre_id'])
+        
+        response = requests.get(url, headers=headers).json()
+        for movie in response['results']:
+            if set(movie['genre_ids']).issubset(set(genre_li)):
+                # for genre_id in movie['genre_ids']:
+                print(movie['genre_ids'])
+                for idx, genre_id in enumerate(movie['genre_ids']):
+                    # genre_id = int(genre_id)
+                    movie['genre_ids'][idx] = int(genre_id)
+                    print(genre_id)
+                    # print(type(genre_id))
+                save_data = {
                     'movie_id': movie['id'],
                     'title': movie['title'],
                     'overview': movie['overview'],
@@ -21,44 +71,23 @@ def get_movie_data():
                     'created_at': movie['release_date'],
                     'genres': movie['genre_ids']
                 }
-                data = {
-                    'pk': movie['id'],
-                    'model': 'movies.movie',
-                    'fields': fields
-                }
-                total_data.append(data)
-    with open("movie_data.json", "w", encoding="utf-8") as w:
-        json.dump(total_data, w, indent=2, ensure_ascii=False)
 
-# get_movie_data() 
+                serializer = MovieSerializer(data=save_data)
+                if serializer.is_valid(raise_exception=True):
+                    serializer.save()
+    return JsonResponse({ 'message': 'okay' })
 
-def get_genre_data():
-    url = 'https://api.themoviedb.org/3/genre/movie/list'
-    params = {
-        'language': 'en',
-    }
-    access_token = 'eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJhNTY1MmE0YzlhM2I1OTgzNzJlNDE4YTNiOWMzNzM3MSIsInN1YiI6IjY1M2I2NDYxNTE5YmJiMDBlMThiOTY1MyIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.oz5MIcA6_UvndsC4rMGZ_8VAwFmkuvwXsFEDx1ufojI'
+
+@api_view(['GET',])
+def get_now_playing(request):
+    url = "https://api.themoviedb.org/3/movie/now_playing?language=en-US&page=1&region=KR"
+
     headers = {
-        'Authorization': f'Bearer {access_token}',
-        'accept': 'application/json'
-    } 
-    response = requests.get(url, params=params, headers=headers)
-    if response.status_code == 200:
-        total_data = []
-        genres_json = response.json()
-        for genre in genres_json['genres']:
-            fields = {
-                'genre_id': genre['id'],
-                'name': genre['name']
-            }
-            data = {
-                'pk': genre['id'],
-                'model': 'movies.genre',
-                'fields': fields
-            }
-            total_data.append(data)
-        with open("genre_data.json", "w", encoding="utf-8") as w:
-            json.dump(total_data, w, indent=2, ensure_ascii=False)
-    return ""
+        "accept": "application/json",
+        "Authorization": f"Bearer {access_token}"
+    }
 
-get_genre_data()
+    response = requests.get(url, headers=headers).json()
+
+    return Response(response['results'])
+
