@@ -5,6 +5,7 @@ app_name = 'movies'
 urlpatterns = [
     path('save_genre_data/', views.save_genre_data, name='save_genre_data'),
     path('save_movie_data/', views.save_movie_data, name='save_movie_data'),
+    path('save_review_data/', views.save_review_data, name='save_review_data'),
     # path('list_data', views.list_data, name='list_data'),
     path('get_now_playing/', views.get_now_playing, name='get_now_playing'),
     # path('', views.index, name='index'),

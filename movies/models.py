@@ -4,25 +4,27 @@ from django.conf import settings
 
 # Create your models here.
 class Genre(models.Model):
-    genre_id = models.IntegerField()
+    id = models.IntegerField(primary_key=True)
     name = models.CharField(max_length=50)
     
 class Movie(models.Model):
-    movie_id = models.IntegerField()
-    title = models.CharField(max_length=50)
+    id = models.IntegerField(primary_key=True)
+    title = models.CharField(max_length=100)
     overview = models.TextField(blank=True)
     poster = models.TextField(blank=True)
     created_at = models.DateField(auto_now_add=True)
     genres = models.ManyToManyField(Genre)
+    review = models.ManyToManyField(settings.AUTH_USER_MODEL, through='Review', related_name='reviewed_movie')
 
 
 class Review(models.Model):
-    movie_pk = models.ForeignKey(Movie, on_delete=models.CASCADE)
+    movie = models.ForeignKey(Movie, on_delete=models.CASCADE, related_name='movie_reviews')
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     content = models.TextField()
     rating = models.FloatField(
-        validators=[MinValueValidator(0.0), MaxValueValidator(5.0)]
+        validators=[MinValueValidator(0.0), MaxValueValidator(10.0)]
     )
-    user_pk = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    
 
 class Review_likes(models.Model):
     user_pk = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
