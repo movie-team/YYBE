@@ -9,8 +9,10 @@ urlpatterns = [
     # path('list_data', views.list_data, name='list_data'),
     path('get_now_playing/', views.get_now_playing, name='get_now_playing'),
     # path('', views.index, name='index'),
-    # path('<int:movie.pk>/', views.detail, name='detail'),
-    # path('review/<int:review.pk>/likes/', views.likes, name='likes'),
+    path('get_popular_movies/', views.get_popular_movies, name='get_popular_movies'),
+    path('<int:movie_id>/', views.movie_detail, name='movie_detail'),
+    path('<int:movie_id>/review/<int:review_id>/', views.review_detail, name='review_detail'),
+    # path('<int:movie_id>/review/<int:review_id>/likes/', views.likes, name='likes'),
     # path('<int:movie.pk>/ticketing/', views.ticketing, name='ticketing'),
     # path('worldcup/', views.worldcup, name='worldcup'),
 ]

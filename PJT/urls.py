@@ -26,9 +26,9 @@ urlpatterns = [
     path('accounts/signup/', include('dj_rest_auth.registration.urls')),
     path('', include('django.contrib.auth.urls')),
     # 소셜 로그인
-    path('account/', include('allauth.urls')),
-    path('account/login/kakao/', views.kakao_login, name='kakao_login'),
-    path('account/login/kakao/callback/', views.kakao_callback, name='kakao_callback'),
+    # path('account/', include('allauth.urls')),
+    path('accounts/login/kakao/', views.kakao_login, name='kakao_login'),
+    path('accounts/login/kakao/callback/', views.kakao_callback, name='kakao_callback'),
     # 영화 관련 api 경로
     path('movies/', include('movies.urls')),
     # 정적 파일 설정

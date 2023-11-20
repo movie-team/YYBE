@@ -12,9 +12,10 @@ class Movie(models.Model):
     title = models.CharField(max_length=100)
     overview = models.TextField(blank=True)
     poster = models.TextField(blank=True)
-    created_at = models.DateField(auto_now_add=True)
+    release_date = models.DateField()
     genres = models.ManyToManyField(Genre)
     review = models.ManyToManyField(settings.AUTH_USER_MODEL, through='Review', related_name='reviewed_movie')
+    # like_users = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='like_movies', on_delete=models.CASCADE)
 
 
 class Review(models.Model):

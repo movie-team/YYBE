@@ -86,7 +86,7 @@ REST_FRAMEWORK = {
     ],
     # permission
     'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.IsAuthenticated',
+        'rest_framework.permissions.AllowAny',
     ],
 }
 
@@ -120,7 +120,7 @@ MIDDLEWARE = [
 CORS_ALLOWED_ORIGINS = [
     'http://127.0.0.1:5173',
     'http://localhost:5173',
-    'https://6016-175-209-62-47.ngrok-free.app',
+    'https://abb3-175-209-62-47.ngrok-free.app',
 ]
 
 
@@ -200,4 +200,4 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = 'accounts.User'
 
 # Ngrok 으로 서버 열때마다 매번 아래 호스트 주소 업데이트 필요
-ALLOWED_HOSTS = ['6016-175-209-62-47.ngrok-free.app', '127.0.0.1']
+ALLOWED_HOSTS = ['abb3-175-209-62-47.ngrok-free.app', '127.0.0.1']

@@ -1,21 +1,25 @@
 from django.shortcuts import render, redirect      
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
 import requests    
 
 
 # code 요청
+@api_view(['GET',])
 def kakao_login(request):
     app_rest_api_key = 'ea9a470844fc6ce1db188cf13bbe325a'
     # redirect_uri = "https://kauth.kakao.com/.well-known/openid-configuration"
-    redirect_uri = "http://127.0.0.1:8000/account/login/kakao/callback"
+    redirect_uri = "http://127.0.0.1:8000/accounts/login/kakao/callback"
     return redirect(
         f"https://kauth.kakao.com/oauth/authorize?client_id={app_rest_api_key}&redirect_uri={redirect_uri}&response_type=code"
     )
     
     
 # access token 요청
+@api_view(['GET',])
 def kakao_callback(request): 
     app_rest_api_key = 'ea9a470844fc6ce1db188cf13bbe325a'
-    redirect_uri = "http://127.0.0.1:8000/account/login/kakao/callback"                                                                 
+    redirect_uri = "http://127.0.0.1:8000/accounts/login/kakao/callback"                                                                 
     code = request.GET.get('code')
 
     # POST 요청을 보낼 엔드포인트 URL
@@ -42,12 +46,27 @@ def kakao_callback(request):
         response_data = response.json()
         access_token = response_data.get("access_token")
         # access_token을 사용하거나 처리하는 로직을 작성합니다.
-        print(response_data)
+        user_url = "https://kapi.kakao.com/v2/user/me"
+        auth = f'Bearer {access_token}'
+        HEADER = {
+            "Authorization": auth,
+            "Content-type": "application/x-www-form-urlencoded"
+        }
+        res = requests.get(user_url, headers=HEADER)
+        
+        return Response(res.text)
+
+
     else:
         # 요청이 실패했을 때 처리할 코드
         print("요청이 실패했습니다.")
         print(response.status_code)
         print(response.text)
+
+
+
+
+
 
 def kakao_logout(request):
     ACCESS_TOKEN = request.GET.get('access_token')
