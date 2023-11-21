@@ -11,8 +11,9 @@ urlpatterns = [
     # path('', views.index, name='index'),
     path('get_popular_movies/', views.get_popular_movies, name='get_popular_movies'),
     path('<int:movie_id>/', views.movie_detail, name='movie_detail'),
+    path('<int:movie_id>/likes/', views.movie_likes, name='movie_likes'),
     path('<int:movie_id>/review/<int:review_id>/', views.review_detail, name='review_detail'),
-    # path('<int:movie_id>/review/<int:review_id>/likes/', views.likes, name='likes'),
+    path('<int:movie_id>/review/<int:review_id>/likes/', views.review_likes, name='review_likes'),
     # path('<int:movie.pk>/ticketing/', views.ticketing, name='ticketing'),
     # path('worldcup/', views.worldcup, name='worldcup'),
 ]

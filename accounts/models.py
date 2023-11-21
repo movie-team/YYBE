@@ -50,5 +50,3 @@ from django.contrib.auth.models import AbstractUser, AbstractBaseUser, BaseUserM
 
 class User(AbstractUser):
     nickname = models.CharField(max_length=30)
-    def __str__(self):
-        return self.username

@@ -102,7 +102,6 @@ def get_now_playing(request):
     return Response(response['results'])
 
 
-
 @api_view(['GET', 'POST',])
 def save_review_data(request):
     
@@ -163,7 +162,6 @@ def get_popular_movies(request):
     return Response(serializer.data)
 
 
-
 @api_view(['GET', 'POST'])
 def movie_detail(request, movie_id):
     movie = get_object_or_404(Movie, pk=movie_id)
@@ -194,3 +192,33 @@ def review_detail(request, movie_id, review_id):
     elif request.method == 'DELETE':
         review.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+    
+
+@api_view(['POST'])
+def movie_likes(request, movie_id):
+    movie = get_object_or_404(Movie, pk=movie_id)
+    if request.user in movie.like_users.all():
+        movie.like_users.remove(request.user)
+        is_like = False
+    else:
+        movie.like_users.add(request.user)
+        is_like = True
+        
+    like_count = movie.like_users.all().count()
+
+    return Response({'is_like': is_like, 'like_count': like_count})
+
+
+@api_view(['POST'])
+def review_likes(request, review_id):
+    review = get_object_or_404(Review, pk=review_id)
+    if request.user in review.like_users.all():
+        review.like_users.remove(request.user)
+        is_like = False
+    else:
+        review.like_users.add(request.user)
+        is_like = True
+        
+    like_count = review.like_users.all().count()
+
+    return Response({'is_like': is_like, 'like_count': like_count})

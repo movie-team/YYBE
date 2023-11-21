@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect      
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
+from django.http import JsonResponse
 import requests    
 
 
@@ -53,18 +54,29 @@ def kakao_callback(request):
             "Content-type": "application/x-www-form-urlencoded"
         }
         res = requests.get(user_url, headers=HEADER)
-        
-        return Response(res.text)
+
+        save_url = "https://kapi.kakao.com/v1/user/update_profile"
+        save_headers = {
+            "Content-Type": "application/x-www-form-urlencoded",
+            "Authorization": f"Bearer {access_token}"
+        }
+
+        properties_json = res.json()['properties']
+
+        # 데이터를 urlencode
+        data = {
+            'properties': properties_json
+        }
+
+        # POST 요청 보내기
+        response = requests.post(save_url, headers=save_headers, data=data)
+
+        return JsonResponse({ "message": "요청을 완료했습니다." })
 
 
     else:
         # 요청이 실패했을 때 처리할 코드
-        print("요청이 실패했습니다.")
-        print(response.status_code)
-        print(response.text)
-
-
-
+        return JsonResponse({ "message": "요청이 실패했습니다." })
 
 
 
@@ -89,5 +101,7 @@ def kakao_logout(request):
         return redirect('articles: index')
     else:
         # 요청이 실패한 경우
-        print(f"HTTP 요청 실패 - 상태 코드: {response.status_code}")
-        print(response.text)  # 실패한 경우 응답 본문을 확인할 수 있습니다.
+        return JsonResponse({ "message": "요청이 실패했습니다." })
+
+
+        

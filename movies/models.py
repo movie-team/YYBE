@@ -15,7 +15,7 @@ class Movie(models.Model):
     release_date = models.DateField()
     genres = models.ManyToManyField(Genre)
     review = models.ManyToManyField(settings.AUTH_USER_MODEL, through='Review', related_name='reviewed_movie')
-    # like_users = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='like_movies', on_delete=models.CASCADE)
+    like_users = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='like_movies', blank=True)
 
 
 class Review(models.Model):
@@ -25,10 +25,4 @@ class Review(models.Model):
     rating = models.FloatField(
         validators=[MinValueValidator(0.0), MaxValueValidator(10.0)]
     )
-    
-
-class Review_likes(models.Model):
-    user_pk = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    review_pk = models.ForeignKey(Review, on_delete=models.CASCADE)
-    review_likes = models.BooleanField()
-
+    like_users = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='like_reviews', blank=True)
