@@ -14,6 +14,7 @@ urlpatterns = [
     path('<int:movie_id>/likes/', views.movie_likes, name='movie_likes'),
     path('<int:movie_id>/review/<int:review_id>/', views.review_detail, name='review_detail'),
     path('<int:movie_id>/review/<int:review_id>/likes/', views.review_likes, name='review_likes'),
+    path('<int:user_id>/recommend/', views.recommend, name='recommend'),
     # path('<int:movie.pk>/ticketing/', views.ticketing, name='ticketing'),
     # path('worldcup/', views.worldcup, name='worldcup'),
 ]
