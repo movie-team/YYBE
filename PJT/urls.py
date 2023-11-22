@@ -22,11 +22,14 @@ from accounts import views
 urlpatterns = [
     path('admin/', admin.site.urls),
     # 사용자 관련 api 경로
+    # path('account/', include('allauth.urls')),    
     path('accounts/', include('dj_rest_auth.urls')),
     path('accounts/signup/', include('dj_rest_auth.registration.urls')),
     path('', include('django.contrib.auth.urls')),
     # 소셜 로그인
-    # path('account/', include('allauth.urls')),
+    path('accounts/google/login', views.google_login, name='google_login'),
+    path('accounts/google/callback/', views.google_callback, name='google_callback'),  
+    path('accounts/google/login/finish/', views.GoogleLogin.as_view(), name='google_login_todjango'),
     path('accounts/login/kakao/', views.kakao_login, name='kakao_login'),
     path('accounts/login/kakao/callback/', views.kakao_callback, name='kakao_callback'),
     # 영화 관련 api 경로

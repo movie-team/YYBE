@@ -29,6 +29,8 @@ environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 
 API_KEY = env('API_KEY')
 ACCESS_TOKEN = env('ACCESS_TOKEN')
+GOOGLE_CLI_ID = env('GOOGLE_CLI_ID')
+GOOGLE_CLI_PW = env('GOOGLE_CLI_PW')
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
@@ -48,12 +50,14 @@ INSTALLED_APPS = [
     'numpy',
     'rest_framework',
     'rest_framework.authtoken',
+    'rest_framework_simplejwt.token_blacklist',
     'dj_rest_auth',
     'corsheaders',
     'django.contrib.sites',
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
+    'allauth.socialaccount.providers.google',
     'allauth.socialaccount.providers.kakao',
     'dj_rest_auth.registration',
     'django.contrib.admin',
@@ -80,7 +84,7 @@ REST_FRAMEWORK = {
     # Authentication
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.SessionAuthentication',
-        'rest_framework.authentication.TokenAuthentication',
+        'dj_rest_auth.jwt_auth.JWTCookieAuthentication',
     ],
     # permission
     'DEFAULT_PERMISSION_CLASSES': [
@@ -88,10 +92,19 @@ REST_FRAMEWORK = {
     ],
 }
 
-ACCOUNT_AUTHENTICATED_LOGIN_REDIRECTS = True
-LOGIN_REDIRECT_URL = "/"
-ACCOUNT_AUTHENTICATED_LOGOUT_REDIRECTS = True
-ACCOUNT_LOGOUT_REDIRECT_URL = "/"
+# ACCOUNT_AUTHENTICATED_LOGIN_REDIRECTS = True
+# LOGIN_REDIRECT_URL = "/"
+# ACCOUNT_AUTHENTICATED_LOGOUT_REDIRECTS = True
+# ACCOUNT_LOGOUT_REDIRECT_URL = "/"
+
+REST_USE_JWT = True
+from datetime import timedelta
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(hours=2),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
+    'ROTATE_REFRESH_TOKENS': False,
+    'BLACKLIST_AFTER_ROTATION': True,
+}
 
 # 회원가입 등록 시 CustomRegisterSerializer 사용
 # REST_AUTH_REGISTER_SERIALIZERS = {
