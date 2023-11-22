@@ -12,16 +12,9 @@ from allauth.socialaccount.providers.oauth2.client import OAuth2Client
 from rest_framework import status
 from json.decoder import JSONDecodeError
 
-'''
-GENRE_URL='https://api.themoviedb.org/3/genre/movie/list'
-ACCESS_TOKEN='eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJhNTY1MmE0YzlhM2I1OTgzNzJlNDE4YTNiOWMzNzM3MSIsInN1YiI6IjY1M2I2NDYxNTE5YmJiMDBlMThiOTY1MyIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.oz5MIcA6_UvndsC4rMGZ_8VAwFmkuvwXsFEDx1ufojI'
-API_KEY='a5652a4c9a3b598372e418a3b9c37371'
-GOOGLE_CLI_ID='257469316138-4gpss6b1c78c7rdmvdf0qkn1bmkqnq0v.apps.googleusercontent.com'
-GOOGLE_CLI_PW='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'
-'''
 
-state = getattr(settings, 'STATE')
-BASE_URL = 'http://localhost:8000/'
+
+BASE_URL = 'http://127.0.0.1:8000/'
 GOOGLE_CALLBACK_URI = BASE_URL + 'accounts/google/callback/'
 
 client_id = settings.GOOGLE_CLI_ID
@@ -41,6 +34,7 @@ def google_callback(request):
     # client_id = getattr(settings, "SOCIAL_AUTH_GOOGLE_CLIENT_ID")
     # client_secret = getattr(settings, "SOCIAL_AUTH_GOOGLE_SECRET")
     code = request.GET.get('code')
+    state = request.GET.get('state')
     """
     Access Token Request
     """
@@ -108,7 +102,7 @@ class GoogleLogin(SocialLoginView):
 def kakao_login(request):
     app_rest_api_key = 'ea9a470844fc6ce1db188cf13bbe325a'
     # redirect_uri = "https://kauth.kakao.com/.well-known/openid-configuration"
-    redirect_uri = "http://127.0.0.1:8000/accounts/login/kakao/callback"
+    redirect_uri = "http://127.0.0.1:8000/accounts/login/kakao/callback/"
     return redirect(
         f"https://kauth.kakao.com/oauth/authorize?client_id={app_rest_api_key}&redirect_uri={redirect_uri}&response_type=code"
     )
