@@ -11,7 +11,17 @@ from allauth.socialaccount.providers.google import views as google_view
 from allauth.socialaccount.providers.oauth2.client import OAuth2Client
 from rest_framework import status
 from json.decoder import JSONDecodeError
+from .serializers import UserSerializer
+from django.contrib.auth import get_user_model
 
+
+@api_view(['GET',])
+def user_info(request, user_id):
+    user = get_user_model().objects.get(id=user_id)
+    data = {'user': user}
+    serializer = UserSerializer(data=data)
+    if serializer.is_valid(raise_exception=True):
+        return Response(serializer.data)
 
 
 BASE_URL = 'http://127.0.0.1:8000/'

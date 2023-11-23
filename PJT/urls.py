@@ -22,9 +22,10 @@ from accounts import views
 urlpatterns = [
     path('admin/', admin.site.urls),
     # 사용자 관련 api 경로
-    # path('account/', include('allauth.urls')),    
     path('accounts/', include('dj_rest_auth.urls')),
+    # path('accounts/', include('allauth.urls')),
     path('accounts/signup/', include('dj_rest_auth.registration.urls')),
+    path('accounts/<int:user_id>/', views.user_info, name='user_info'),
     path('', include('django.contrib.auth.urls')),
     # 소셜 로그인
     path('accounts/google/login', views.google_login, name='google_login'),
