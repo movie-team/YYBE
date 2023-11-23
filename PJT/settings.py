@@ -220,4 +220,4 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = 'accounts.User'
 
 # Ngrok 으로 서버 열때마다 매번 아래 호스트 주소 업데이트 필요
-ALLOWED_HOSTS = ['4cf0-175-209-62-47.ngrok-free.app', '127.0.0.1']
+ALLOWED_HOSTS = ['66f2-222-106-144-152.ngrok.io', '127.0.0.1']
