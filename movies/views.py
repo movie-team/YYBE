@@ -321,6 +321,7 @@ def save_review_data(request):
         if response.get('results'):
 
             for result in response.get('results'):
+
                 # username 사이의 공백, 특수문자 등 제거
                 username = clean_username(result['author_details']['username'])
 
@@ -330,13 +331,15 @@ def save_review_data(request):
                     'password1': 'rkskekfk',
                     'password2': 'rkskekfk'
                 }
-                
+
                 url = 'http://127.0.0.1:8000/accounts/signup/'
 
                 users = get_user_model().objects.all().values_list('username', flat=True)
 
                 if username not in users:
-                    requests.post(url, data=save_user_data, headers=headers)
+                    # requests.post(url, data=save_user_data, headers=headers)
+                    requests.post(url, data=save_user_data)
+
 
                 if not result['author_details']['rating']:
                     result['author_details']['rating'] = 7.0

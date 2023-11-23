@@ -93,6 +93,7 @@ REST_FRAMEWORK = {
     # Authentication
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.TokenAuthentication',
         'dj_rest_auth.jwt_auth.JWTCookieAuthentication',
     ],
     # permission
@@ -101,12 +102,18 @@ REST_FRAMEWORK = {
     ],
 }
 
+# AUTHENTICATION_BACKENDS = [
+#     'dj_rest_auth.authentication.AllAuthJWTAuthentication',
+#     # 다른 인증 백엔드들...
+# ]
+
 # ACCOUNT_AUTHENTICATED_LOGIN_REDIRECTS = True
 # LOGIN_REDIRECT_URL = "/"
 # ACCOUNT_AUTHENTICATED_LOGOUT_REDIRECTS = True
 # ACCOUNT_LOGOUT_REDIRECT_URL = "/"
 
 REST_USE_JWT = True
+
 from datetime import timedelta
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(hours=2),
@@ -116,9 +123,7 @@ SIMPLE_JWT = {
 }
 
 # 회원가입 등록 시 CustomRegisterSerializer 사용
-# REST_AUTH_REGISTER_SERIALIZERS = {
-#     'REGISTER_SERIALIZER': 'accounts.serializers.UserSerializer',
-# }
+
 REST_AUTH = {
     'REGISTER_SERIALIZER': 'accounts.serializers.UserSerializer',
 }
@@ -137,11 +142,15 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
+
+
 CORS_ALLOWED_ORIGINS = [
     'http://127.0.0.1:5173',
     'http://localhost:5173',
-    'https://4cf0-175-209-62-47.ngrok-free.app',
+    'https://0fc1-175-209-62-47.ngrok-free.app',
 ]
+
+CSRF_TRUSTED_ORIGINS = ['http://localhost:5173', 'http://127.0.0.1:5173']
 
 
 ROOT_URLCONF = 'PJT.urls'
@@ -220,4 +229,4 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = 'accounts.User'
 
 # Ngrok 으로 서버 열때마다 매번 아래 호스트 주소 업데이트 필요
-ALLOWED_HOSTS = ['4cf0-175-209-62-47.ngrok-free.app', '127.0.0.1']
+ALLOWED_HOSTS = ['0fc1-175-209-62-47.ngrok-free.app', '127.0.0.1']
