@@ -13,3 +13,8 @@ class UserSerializer(RegisterSerializer):
         data['nickname'] = self.validated_data.get('nickname', '')
 
         return data
+
+class CustomUserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = '__all__'

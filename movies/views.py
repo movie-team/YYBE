@@ -299,6 +299,22 @@ def get_now_playing(request):
     }
 
     response = requests.get(url, headers=headers).json()
+    movies = Movie.objects.values_list('id', flat=True)
+    for movie in response['results']:
+        if movie['id'] not in movies:
+            save_data = {
+                'id': movie['id'],
+                'title': movie['title'],
+                'overview': movie['overview'],
+                'poster': movie['poster_path'],
+                'release_date': movie['release_date'],
+                'genres': movie['genre_ids']
+            }
+
+            serializer = MovieSerializer(data=save_data)
+            if serializer.is_valid(raise_exception=True):
+                serializer.save()
+
 
     return Response(response['results'])
 
