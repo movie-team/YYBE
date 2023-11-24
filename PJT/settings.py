@@ -145,7 +145,7 @@ MIDDLEWARE = [
 CORS_ALLOWED_ORIGINS = [
     'http://127.0.0.1:5173',
     'http://localhost:5173',
-    'https://66f2-222-106-144-152.ngrok.io',
+    'https://6671-175-209-62-47.ngrok-free.app',
 ]
 
 CSRF_TRUSTED_ORIGINS = ['http://localhost:5173', 'http://127.0.0.1:5173']
@@ -227,4 +227,4 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = 'accounts.User'
 
 # Ngrok 으로 서버 열때마다 매번 아래 호스트 주소 업데이트 필요
-ALLOWED_HOSTS = ['66f2-222-106-144-152.ngrok.io', '127.0.0.1']
+ALLOWED_HOSTS = ['6671-175-209-62-47.ngrok-free.app', '127.0.0.1']

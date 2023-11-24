@@ -5,6 +5,7 @@ from django.contrib.auth import get_user_model
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
+from django.contrib.auth.decorators import login_required
 import numpy as np
 import requests
 from .serializers import MovieSerializer, GenreSerializer, ReviewSerializer
@@ -174,6 +175,7 @@ class MatrixFactorization():
         print(self._training_process[self._epochs-1][1])
 
 
+@login_required
 @api_view(['GET',])
 def recommend(request, user_id):
     movies = Movie.objects.all().values_list('id', flat=True)
@@ -390,10 +392,14 @@ def movie_detail(request, movie_id):
         return Response(serializer.data)
     
     elif request.method == 'POST':
-        review_serializer = ReviewSerializer(data=request.data)
-        if review_serializer.is_valid(raise_exception=True):
-            review_serializer.save(user=request.user, movie=movie)
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        if request.user.is_authenticated:
+            review_serializer = ReviewSerializer(data=request.data)
+            if review_serializer.is_valid(raise_exception=True):
+                review_serializer.save(user=request.user, movie=movie)
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            return Response(status=status.HTTP_403_FORBIDDEN)
+
 
 
 @api_view(['GET', 'PUT', 'DELETE',])
@@ -404,16 +410,23 @@ def review_detail(request, movie_id, review_id):
         return Response(serializer.data)
     
     elif request.method == 'PUT':
-        review_serializer = ReviewSerializer(review, data=request.data)
-        if review_serializer.is_valid(raise_exception=True):
-            review_serializer.save()
-            return Response(serializer.data, status=status.HTTP_200_OK)
+        if request.user.is_authenticated and request.user.id == review.user_id:
+            review_serializer = ReviewSerializer(review, data=request.data)
+            if review_serializer.is_valid(raise_exception=True):
+                review_serializer.save()
+                return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            return Response(status=status.HTTP_403_FORBIDDEN)
         
     elif request.method == 'DELETE':
-        review.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        if request.user.is_authenticated and request.user.id == review.user_id:
+            review.delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        else:
+            return Response(status=status.HTTP_403_FORBIDDEN)
     
 
+@login_required
 @api_view(['POST'])
 def movie_likes(request, movie_id):
     movie = get_object_or_404(Movie, pk=movie_id)
@@ -429,6 +442,7 @@ def movie_likes(request, movie_id):
     return Response({'is_like': is_like, 'like_count': like_count})
 
 
+@login_required
 @api_view(['POST'])
 def review_likes(request, review_id):
     review = get_object_or_404(Review, pk=review_id)

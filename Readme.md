@@ -1,61 +1,80 @@
-# 🖥 영화 프로젝트 백엔드
+1. 팀원 정보 및 업무 분담 내역
+<br>
+권기용 : DB 구축, REST-API 를 활용한 백엔드 개발
+<br>
+최진영 : 퍼블리싱, Vue.js 를 이용한 프론트엔드 개발
 
 
-## 🤖 프로젝트 멤버
-
-<table>
- <tr>
-    <td align="center"><a href="https://github.com/sirlyun"><img src="https://avatars.githubusercontent.com/sirlyun" width="130px;" alt=""></a></td>
-    <td align="center"><a href="https://github.com/tooyul"><img src="https://avatars.githubusercontent.com/tooyul" width="130px;" alt=""></a></td>
-    <td align="center"><a href="https://github.com/calendar2"><img src="https://avatars.githubusercontent.com/calendar2" width="130px;" alt=""></a></td>
-  </tr>
-  <tr>
-    <td align="center"><a href="https://github.com/sirlyun"><b>sirlyun</b></a></td>
-    <td align="center"><a href="https://github.com/tooyul"><b>tooyul</b></a></td>
-    <td align="center"><a href="https://github.com/calendar2"><b>calendar2</b></a></td>
-  </tr>
-</table>
-
-<br/>
-
-
-## 📌 기능 명세
-
-<br/>
-
-## 💾 ERD
-
-![Movie (1)](https://github.com/movie-team/BackEnd/assets/116432941/204367eb-8e96-4786-9aca-c8ad609e81c6)
-
-<br/>
-
-## ⚠️ commit 컨벤션
-
-```
-{이모지}{태그}: {커밋 메시지}
-```
-
-### 이모지 및 태그
-
-- 이모지는 선택에 따라 활용한다.
-
-| 이모지 | 태그       | 설명                      |
-|:----|:---------|:------------------------|
-| ✨   | feat    | 기본적인 커밋             |
-| ♻️  | refactor | 코드 수정                |
-| ✏️  | comment  | 주석 변경(코드 변경 X) |
-| 📝  | docs     | README와 같은 문서 수정        |
-| 🚚  | rename   | 파일, 폴더명 수정 혹은 이동        |
+2. 목표 서비스 구현 및 실제 구현 정도
+<br>
+목표:
+<br>
+영화 추천 알고리즘
+<br>
+커뮤니티(유저간 소통 게시판) - 게시글, 댓글, 좋아요, 팔로우
+<br>
+소셜 로그인
+<br>
+기본 로그인
+<br>
+영화 예매
+<br>
+영화 월드컵
+<br>
+영화 테스트 (MBTI처럼)
+<br>
+ChatGPT를 이용한 영화 추천
+<br><br>
+실제:
+<br>
+영화 추천 알고리즘
+<br>
+CRUD - 영화 목록, 상세, 리뷰 게시, 좋아요
+<br>
+기본 로그인(nickname 필드 추가)
 
 
-<br/>
 
-## ⚠️ PR 규칙
-
-```
-[날짜] 변경자명
-```
+3. 데이터베이스 모델링 (ERD)
+<br>
+Movie 모델과 User 모델을 ManyToMany 관계로 Review 모델을 통해 연결
 
 
-<br/>
+4. 영화 추천 알고리즘에 대한 기술적 설명
+<br>
+Matrix Factorization 알고리즘을 활용,
+<br>
+전체 유저들의 전체 영화에 대한 각각의 점수 Matrix를 생성(빈칸은 0점으로 놓는다)
+<br>
+이 때 유저들이 영화에 점수를 매길 때 평가의 척도가 되는 column들을 임의로 생성
+<br>
+또 영화마다 각 척도에 대해 얼마나 관련도가 있는지 column들을 임의로 생성
+<br>
+이론상 각 유저의 척도와 영화의 척도들을 행렬곱하면 영화의 평점이 됨
+<br>
+이렇게 처음 Matrix를 유저X척도, 척도X영화 두 행렬로 분해 한 후 그 행렬곱이
+<br>
+유저X영화 Matrix의 원래 평점에 가까워지도록 수치를 반복해서 조정
+<br>
+근접한 두 유저X척도, 척도X영화 행렬의 행렬곱을 통해 원래 Matrix에서 비어있던 점수를 임의로 예측해서 생성
+<br>
+유저 별로 이 임의의 점수를 통해 높은 순으로 영화를 추천할 수 있다
 
+
+5. 서비스 대표 기능에 대한 설명
+<br>
+영화별로 리뷰를 작성하고 리뷰에 좋아요 기능과 리뷰 별 좋아요 갯수를 나타냄으로써
+<br>
+리뷰의 신뢰도를 확인할 수 있고 이를 통해 영화의 재미를 예측할 수 있다
+<br>
+또한 추천 알고리즘을 통해 내가 재미있게 볼만한 영화를 추천받을 수 있다
+
+
+6. 기타 (느낀점, 후기 등)
+<br>
+첫 목표는 방대하게 구상했지만 구현 중에 한번 막히면 꽤 오랜 시간 지체되어서
+기본적인 목표를 제외하고는 구현하지 못했다
+<br>
+프로젝트를 할 때 시간이 부족하다는 걸 체감하게 되었고, 개발 도중 애플리케이션의 
+기능이 즉흥적으로 추가되고 삭제될 때 마다 model 이나 serializer 등 다른 구조들도
+수정하게 되면서 시간이 더 지체되었기 때문에 기획 단계의 중요성을 알게 되었다.
